@@ -36,3 +36,10 @@ The site does not collect payments, hold escrow, or issue refunds. Class and phy
 Run the transactional SQL checks in `supabase/tests/marketplace.sql`, the signed Edge Function connection checks, TypeScript checks, and the production build. Test records must be rolled back or removed. The security advisor's private-table no-policy notices are intentional default-deny rules; [details](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy).
 
 Sites remains the hosting/deployment path. GitHub is the source repository; automatic GitHub-to-Sites deployment is not configured. Keep both source snapshots aligned explicitly. Rollback can use the prior Sites version, with D1 pilot records still intact; do not delete live Supabase data during rollback.
+
+## Google login extension
+
+Google login uses Supabase Auth with server-verified users and HttpOnly session
+cookies. It preserves the Sites-managed ChatGPT flow. See
+[Google activation and identity behavior](google-login.md); provider activation
+and a real Google consent round trip are still pending.

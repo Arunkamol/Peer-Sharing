@@ -1,10 +1,11 @@
+import {requestAuth} from './supabase-auth';
 import {liveEnabled,liveCall} from './live-backend';
 import {env} from 'cloudflare:workers';
 import {catalog,sampleRequests,type Listing} from './catalog';
 export function db(){const d=(env as any).DB as D1Database;if(!d)throw new Error('Storage unavailable');return d}
 export function bucket(){return (env as any).BUCKET as R2Bucket}
-export function identity(req:Request){const id=req.headers.get('oai-authenticated-user-id'); if(id)return id; if(process.env.NODE_ENV==='development')return 'local-preview';return null}
-export function owner(req:Request){const id=identity(req);if(!id)throw new Error('AUTH');return id}
+export async function identity(req:Request){const auth=requestAuth(req);const id=await auth.getActor();if(id)return id;if(!auth.hasSession&&!liveEnabled()&&process.env.NODE_ENV==='development')return 'local-preview';return null}
+export async function owner(req:Request){const id=await identity(req);if(!id)throw new Error('AUTH');return id}
 export function safeRequest(req:Request){const origin=req.headers.get('origin');const site=new URL(req.url).origin;if(origin&&origin!==site)throw new Error('ORIGIN')}
 export const rows=async(sql:string,...args:any[])=>{const r=await db().prepare(sql).bind(...args).all<any>();return r.results??[]};
 export const parse=(r:any)=>({...JSON.parse(r.payload),id:r.id,...(r.status?{status:r.status}:{}),...(r.owner?{owner:r.owner}:{}),...(r.created?{created:r.created}:{}),...(r.completed?{completed:r.completed}:{} )});

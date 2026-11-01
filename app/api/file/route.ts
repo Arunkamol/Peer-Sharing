@@ -1,8 +1,9 @@
+import {withAuth} from '@/lib/supabase-auth';
 import {liveEnabled,liveCall} from '@/lib/live-backend';
 import {PDFDocument,StandardFonts,rgb,degrees} from 'pdf-lib';
 import {owner,identity,db,bucket,getListing,parse,fail} from '@/lib/server';
 export const dynamic='force-dynamic';
-export async function GET(req:Request){try{const url=new URL(req.url);const preview=url.searchParams.get('preview');const id=url.searchParams.get('order');const user=preview?identity(req):owner(req);let item,order:any;
+async function handleGET(req:Request){try{const url=new URL(req.url);const preview=url.searchParams.get('preview');const id=url.searchParams.get('order');const user=preview?await identity(req):await owner(req);let item,order:any;
  if(liveEnabled()){const access=await liveCall('file_access',user,{preview:preview||'',order:id||''});if(access.error)return Response.json({error:access.error},{status:access.status||403});item=access.item;order=access.order;}else if(preview)item=await getListing(preview,user);else {order=await db().prepare('SELECT * FROM orders WHERE id=? AND owner=?').bind(id,user).first<any>();if(!order||!['paid_held','downloaded'].includes(order.status))return Response.json({error:'This file is not available for this order.'},{status:403});item=await getListing(parse(order).item,user)}
  if(!item||item.kind!=='digital')return Response.json({error:'Not found'},{status:404});
  let doc:PDFDocument;
@@ -11,3 +12,5 @@ export async function GET(req:Request){try{const url=new URL(req.url);const prev
  const mark=await doc.embedFont(StandardFonts.Helvetica);const buyer=preview?'PREVIEW - PEER SHARING':`Peer Sharing copy - order ${order.id.slice(0,8)}`;for(const p of doc.getPages()){p.drawText(buyer,{x:20,y:20,size:9,font:mark,color:rgb(.62,.34,.5),opacity:.8});if(preview)p.drawText('PREVIEW',{x:60,y:p.getHeight()/2,size:60,font:mark,color:rgb(.82,.48,.63),opacity:.18,rotate:degrees(32)})}
  const bytes=await doc.save();if(order&&liveEnabled()){const result=await liveCall('download_complete',user,{id:order.id});if(result.error)return Response.json({error:result.error},{status:403})}if(order&&!liveEnabled()&&order.status==='paid_held')await db().prepare('UPDATE orders SET status=?,completed=? WHERE id=? AND owner=?').bind('downloaded',Date.now(),order.id,user).run();return new Response(bytes as any,{headers:{'Content-Type':'application/pdf','Content-Disposition':`${preview?'inline':'attachment'}; filename="peer-sharing-${item.id.slice(0,35)}${preview?'-preview':''}.pdf"`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}})
  }catch(e){return fail(e)}}
+
+export const GET=withAuth(handleGET);

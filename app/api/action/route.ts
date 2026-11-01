@@ -1,3 +1,4 @@
+import {withAuth} from '@/lib/supabase-auth';
 import {liveEnabled,liveAction} from '@/lib/live-backend';
 import {db,owner,safeRequest,getListing,emit,fail,rows,parse} from '@/lib/server';
 import {z} from 'zod';
@@ -6,8 +7,8 @@ import {timeSlots} from '@/lib/tutoring';
 const short=z.string().trim().min(1).max(200);
 const long=z.string().trim().min(1).max(3000);
 const validId=z.string().min(1).max(120);
-export async function POST(req:Request){try{
- safeRequest(req);const user=owner(req);if(Number(req.headers.get('content-length'))>30000)return Response.json({error:'Too much data'},{status:413});
+async function handlePOST(req:Request){try{
+ safeRequest(req);const user=await owner(req);if(Number(req.headers.get('content-length'))>30000)return Response.json({error:'Too much data'},{status:413});
  const {action,data}=await req.json() as {action:string;data:any};const now=Date.now();
  if(liveEnabled())return await liveAction(action,data,user);
  const chat=await chatAction(action,data,user);if(chat)return chat;
@@ -87,3 +88,5 @@ export async function POST(req:Request){try{
  }
  return Response.json({error:'Unknown action'},{status:400});
  }catch(e){if(e instanceof z.ZodError)return Response.json({error:'ข้อมูลไม่ครบหรือไม่ถูกต้อง / Please check your entries',fields:e.flatten()},{status:400});return fail(e)}}
+
+export const POST=withAuth(handlePOST);

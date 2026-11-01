@@ -20,7 +20,7 @@ Thai-first peer learning marketplace with a responsive Chulalongkorn-inspired pi
 
 Supabase stores the live community data. Sites retains platform sign-in and hosts the server. The server signs short-lived requests to the `peer-api` Edge Function; its private signing key is a Sites runtime secret. The function verifies signatures before using Supabase's server credentials. Private R2 objects remain in the existing Site bucket.
 
-The Supabase RPC is executable only by `service_role`; client roles have no schema, table, or function access. All operations authorize the Sites-issued actor and participants. See [backend details](docs/backend-integration.md).
+The Supabase RPC is executable only by `service_role`; client roles have no schema, table, or function access. All operations authorize the server-verified actor and participants. See [backend details](docs/backend-integration.md).
 
 GitHub stores source and migrations. Pushes do not automatically deploy or mirror Sites. Publish using the supported Sites workflow and synchronize source changes explicitly.
 
@@ -41,3 +41,10 @@ Supabase security advisors report informational `rls_enabled_no_policy` notices 
 Use Node.js 22.13+ and the pnpm version pinned in `package.json`. Install with the committed lockfile, then use `pnpm dev`, `pnpm exec tsc --noEmit --incremental false`, and `pnpm build`. Existing D1 migrations are retained; Supabase migrations are under `supabase/migrations`. Never change an applied migration.
 
 Runtime keys are `PEER_BACKEND_URL` and secret `PEER_BACKEND_SIGNING_KEY`. Never commit credentials or database exports. See the backend document for key rotation. Without the live runtime configuration, local development retains the previous isolated pilot path; it must not be used to judge production live-data behavior.
+
+## Google login
+
+Google sign-in support is prepared alongside ChatGPT sign-in. The Google provider
+is disabled until its owner-configured OAuth client is saved in Supabase. See
+[the activation guide](docs/google-login.md) for exact origins, callback URLs and
+testing steps. Existing ChatGPT records retain their original account IDs.

@@ -235,3 +235,8 @@ html { scroll-padding-top: 110px; }
   .content:has(.tutor-page) { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
   .dialog-custom { max-height: calc(var(--visible-viewport-height) - 20px); }
 }
+
+/* Account controls keep a reachable touch target on small screens. */
+.auth-header-link{white-space:nowrap;min-height:40px;padding:8px 14px}
+.auth-profile-actions{display:flex;justify-content:flex-end;margin-bottom:16px}
+@media(max-width:480px){.auth-header-link{padding:8px 11px;font-size:12px}}
