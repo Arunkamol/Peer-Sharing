@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {webcrypto} from 'node:crypto';
+process.stdout.write('Ready for signing-key JSON on stdin (input is hidden).\n');
+let input='';
+for await(const chunk of process.stdin){input+=chunk;if(input.includes('\n'))break}
+const key=await webcrypto.subtle.importKey('jwk',JSON.parse(input),{name:'ECDSA',namedCurve:'P-256'},false,['sign']);
+input='';
+const url='https://kaljfnkanscjtdmakkzq.supabase.co/functions/v1/peer-api';
+const body=JSON.stringify({op:'state',actor:null,data:{}});
+const sign=async(timestamp,content)=>Buffer.from(await webcrypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},key,Buffer.from(timestamp+'.'+content))).toString('base64');
+const timestamp=String(Date.now()),signature=await sign(timestamp,body);
+const send=(headers,content=body)=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...headers},body:content,signal:AbortSignal.timeout(20000)});
+assert.equal((await send({})).status,401,'unsigned request rejected');
+const stale=String(Date.now()-120000);
+assert.equal((await send({'X-Peer-Timestamp':stale,'X-Peer-Signature':await sign(stale,body)})).status,401,'expired signature rejected');
+assert.equal((await send({'X-Peer-Timestamp':timestamp,'X-Peer-Signature':signature},body+' ')).status,401,'modified body rejected');
+const result=await send({'X-Peer-Timestamp':timestamp,'X-Peer-Signature':signature});
+assert.equal(result.status,200,'signed request accepted');const state=await result.json();
+assert.equal(state.backend,'supabase');assert.equal(state.signedIn,false);assert.deepEqual(state.orders,[]);assert.deepEqual(state.profile,{});assert.deepEqual(state.conversations,[]);
+process.stdout.write(JSON.stringify({signatureChecks:'passed',supabaseConnection:'passed',publicListingCount:state.listings.length})+'\n');

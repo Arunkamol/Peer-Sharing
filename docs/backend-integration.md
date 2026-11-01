@@ -1,72 +1,38 @@
-# Peer Sharing backend integration
+# Backend integration
 
-Prepared for the source import on 2026-11-01. Supabase provisioning and application migration remain pending.
+Supabase project: `kaljfnkanscjtdmakkzq` (Peer Sharing), owned by Find My 3D, region Singapore. Created 2026-11-01 after approval of the approximately USD 10/month additional project compute cost. Billing is hourly compute usage on the organization's existing Pro invoice; quota overages and add-ons are separate.
 
-## Selected destinations
+## Architecture
 
-| Component | Destination | Status |
-| --- | --- | --- |
-| Source | `Arunkamol/Peer-Sharing` | Initial source import from deployed Sites version 6 |
-| Hosting and API | Existing Peer Sharing Site | Public and responsive |
-| Database | New Supabase project named `Peer Sharing` | Pending cost approval |
-| Organization | `Find My 3D` | Selected by the owner |
-| Region | Singapore (`ap-southeast-1`) | Proposed for the Thailand audience |
-| Cost | USD 10/month | Quoted 2026-10-31; not yet approved |
-| Sign-in | Existing Sites authentication | Preserve during migration |
-| Files | Existing private R2 bucket | Preserve ownership and entitlement checks |
+The browser uses same-origin Sites API routes. Sites supplies the authenticated user ID. The server validates mutations, signs a request with ECDSA P-256/SHA-256, and calls the Supabase `peer-api` Edge Function. The signature covers the timestamp and full request body; requests more than 60 seconds old, altered bodies, and unsigned calls are rejected. The Edge Function calls the constrained `public.peer_gateway` database function using its injected service credentials. No service credentials or private signing keys are sent to browsers.
 
-MakerScapes resources are separate and are not migration targets.
+The `peer` schema is private. Tables have RLS enabled and no public/client grants. `peer_gateway` is SECURITY INVOKER with an empty search path, executable only by service_role. Every operation checks the trusted actor against the record owner or conversation participants. Booking uses transaction-scoped request locks plus listing row locks before capacity checks. Messages and bookings have unique request IDs. Completion is tutor-only after the scheduled end; eligible learners can then review.
 
-## Current behavior
+| Data | Visibility |
+| --- | --- |
+| Profile email and private settings | Account owner |
+| Published listing, tutor display name/faculty, review | Public community |
+| Hidden listing | Owner and relevant booking/conversation participants |
+| Booking | Learner and provider |
+| Conversation/message | Learner and provider |
+| Notification and saved item | Recipient/owner |
+| Original PDF | Private R2; uploader or entitled learner through server checks |
+| PDF preview | First two watermarked pages of an intentionally published listing |
 
-The live app stores records in ten D1 tables: `profiles`, `listings`, `requests`, `marks`, `orders`, `events`, `files`, `reviews`, `conversations`, and `chat_messages`.
+## Runtime configuration
 
-Sample listings are embedded in `lib/catalog.ts`. User-created listings and conversations are isolated per account. `lib/chat-server.ts` generates simulated tutor replies. Payments, refunds, payouts, and completion shortcuts are demo behavior. Changing database credentials alone will not make these workflows real.
+Sites runtime contains `PEER_BACKEND_URL` and secret `PEER_BACKEND_SIGNING_KEY`. The latter is a private P-256 JWK. The matching public JWK is tracked in `supabase/functions/peer-api/public-key.json`. The private key is never committed. Supabase supplies its own database service credentials inside the Edge Function.
 
-## Implementation scope
+Rotate by generating a new key pair securely, updating the Edge Function's public verification key and the Sites secret, and deploying the matching versions together. A mismatch fails closed. Avoid unrelated project keys. The Supabase function has platform JWT checking disabled because it authenticates the server's body signature itself; the database RPC is not callable with an anonymous/publishable key.
 
-1. Provision the dedicated project, inspect its schema, and apply versioned migrations.
-2. Connect the Sites server to Supabase over HTTPS. Store credentials only as runtime secrets. Preserve Sites-issued identity; never accept an acting account ID from the browser.
-3. Separate private profiles from public tutor fields. Share intentionally published listings, retaining existing pilot records as private drafts until the owner publishes them.
-4. Add provider IDs and bookable sessions. Reserve capacity atomically across all learners, with idempotent booking requests and validated cancellation transitions.
-5. Make conversations accessible only to the learner and actual provider. Store the real sender, notify the other participant, and remove simulated tutor responses from real threads.
-6. Allow reviews only for the learner's legitimately completed booking. Remove simulated completion shortcuts from real bookings.
-7. Preserve private PDF access. Keep payment collection disabled until a payment provider and verified webhooks are integrated. Unpaid reservations must not claim payment or escrow success.
-8. Replace sample-only actions with real data and useful empty states; clearly separate any retained demo content.
+## Migration boundaries
 
-## Access boundaries
+Existing D1 pilot data was retained, with no destructive migration. Fictional listings and simulated activity were not imported. Live users create their profile and intentionally publish new listings. Original PDF storage stays in R2 and its live metadata is saved in Supabase. Supabase holds the live profiles, listings, requests, marks, bookings, conversations, messages, notifications, reviews, and file metadata.
 
-| Data | Read access | Write access |
-| --- | --- | --- |
-| Private profile | Owner | Owner |
-| Public tutor profile | Visitors, published fields only | Owner |
-| Listing | Visitors when published; owner for drafts | Owner; separately authorized moderators |
-| Session | Visitors for published listings | Provider |
-| Booking | Learner and provider | Validated transitions only |
-| Conversation and message | Participants | Participant using their own identity |
-| Notification and saved item | Owner | Authorized server logic or owner |
-| Review | Visitors for published listings | Eligible learner, once per completed booking |
-| File | Uploader or entitled learner | Uploader |
+The site does not collect payments, hold escrow, or issue refunds. Class and physical-item reservations explicitly show unpaid status. Paid digital downloads are blocked. University verification, credentials, automated moderation, and outbound email are not configured. Report/dispute records can be reviewed by the project owner in Supabase; no separate staff console is enabled.
 
-Enable row-level security on exposed tables and grant only required access. Keep privileged keys out of client code. Server authorization must precede privileged database calls; constraints and transactions enforce capacity and uniqueness.
+## Verification and deployment
 
-## Migration and verification
+Run the transactional SQL checks in `supabase/tests/marketplace.sql`, the signed Edge Function connection checks, TypeScript checks, and the production build. Test records must be rolled back or removed. The security advisor's private-table no-policy notices are intentional default-deny rules; [details](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy).
 
-Keep D1 intact during migration and available for rollback. Do not turn fictional accounts, simulated chats, sample reviews, or demo payments into real records. Classify user-created data before migration, preserve ownership, and verify record counts and file references.
-
-Before cutover, verify:
-
-- Two distinct users can publish, discover, book, and exchange real messages.
-- A third account cannot access their private conversation, booking, or profile.
-- Anonymous writes and identity spoofing fail.
-- Concurrent booking requests cannot oversell; retries do not duplicate bookings.
-- Cancellation releases capacity and informs participants.
-- Review eligibility and private download entitlements hold.
-- Notification read state is private to its recipient.
-- No simulated payment is shown as real money collected.
-- Supabase advisors, TypeScript checks, production build, and available end-to-end checks pass.
-- Sites publication reaches a successful native deployment result.
-
-## Source and publishing
-
-This repository contains application source and migrations, not private uploads, database exports, credentials, or build output. GitHub and Sites source repositories do not automatically mirror each other. Future changes must be synchronized explicitly and published using the supported Sites workflow. Uploading this source snapshot does not itself change the live app or connect Supabase.
+Sites remains the hosting/deployment path. GitHub is the source repository; automatic GitHub-to-Sites deployment is not configured. Keep both source snapshots aligned explicitly. Rollback can use the prior Sites version, with D1 pilot records still intact; do not delete live Supabase data during rollback.

@@ -1,0 +1,36 @@
+begin;
+set local role service_role;
+do $$
+declare tutor text:='qa-tutor-'||gen_random_uuid();learner text:='qa-learner-'||gen_random_uuid();stranger text:='qa-stranger-'||gen_random_uuid(); l uuid;c uuid;b uuid:=gen_random_uuid();m uuid:=gen_random_uuid();r jsonb;d jsonb;
+begin
+ perform public.peer_gateway(jsonb_build_object('op','profile','actor',tutor,'data',jsonb_build_object('name','QA Tutor','faculty','QA','email','private@example.invalid')));
+ perform public.peer_gateway(jsonb_build_object('op','profile','actor',learner,'data',jsonb_build_object('name','QA Learner','faculty','QA')));
+ d:=jsonb_build_object('kind','class','title','QA Class','course','2110101','description','Test','price',0,'mode','online','date',now()+interval '1 day','duration',60,'seats',2,'minSeats',1,'objectives',jsonb_build_array('one','two','three'),'prep','test','location','test');
+ r:=public.peer_gateway(jsonb_build_object('op','listing','actor',tutor,'data',d));l:=(r->>'id')::uuid;assert l is not null,'create listing';
+ r:=public.peer_gateway(jsonb_build_object('op','state','actor',null));assert (r->'listings')::text like '%'||l::text||'%','public discovery';assert r->'profile'='{}'::jsonb,'anonymous private profile';assert r::text not like '%private@example.invalid%','email not public';
+ r:=public.peer_gateway(jsonb_build_object('op','start_chat','actor',learner,'data',jsonb_build_object('item',l)));c:=(r->>'id')::uuid;assert c is not null,'start chat';
+ r:=public.peer_gateway(jsonb_build_object('op','chat_get','actor',stranger,'data',jsonb_build_object('id',c)));assert r->>'status'='404','third party chat read denied';
+ r:=public.peer_gateway(jsonb_build_object('op','chat_message','actor',stranger,'data',jsonb_build_object('id',c,'requestId',m,'text','forged')));assert r->>'status'='404','third party chat write denied';
+ d:=jsonb_build_object('id',c,'requestId',m,'text','Hello');
+ perform public.peer_gateway(jsonb_build_object('op','chat_message','actor',learner,'data',d));perform public.peer_gateway(jsonb_build_object('op','chat_message','actor',learner,'data',d));
+ assert (select count(*) from peer.messages where conversation=c)=1,'message retry deduplication';
+ r:=public.peer_gateway(jsonb_build_object('op','chat_get','actor',tutor,'data',jsonb_build_object('id',c)));assert r->'messages'->0->>'body'='Hello','provider receives actual message';assert r->'messages'->0->>'mine'='false','provider message side';
+ d:=jsonb_build_object('item',l,'seats',2,'requestId',b,'conversation',c);
+ r:=public.peer_gateway(jsonb_build_object('op','book','actor',learner,'data',d));assert r->>'ok'='true','reserve';
+ r:=public.peer_gateway(jsonb_build_object('op','book','actor',learner,'data',d));assert r->>'id'=b::text,'booking retry deduplication';
+ assert (select count(*) from peer.bookings where item=l)=1,'one booking only';
+ r:=public.peer_gateway(jsonb_build_object('op','book','actor',stranger,'data',jsonb_build_object('item',l,'seats',1,'requestId',gen_random_uuid())));assert r->>'status'='409','global capacity enforced';
+ r:=public.peer_gateway(jsonb_build_object('op','state','actor',stranger));assert r->'orders'='[]'::jsonb,'stranger private orders';
+ r:=public.peer_gateway(jsonb_build_object('op','review','actor',learner,'data',jsonb_build_object('id',b,'clarity',5,'usefulness',5,'recommend',5,'comment','premature')));assert r ? 'error','review before completion blocked';
+ r:=public.peer_gateway(jsonb_build_object('op','complete','actor',learner,'data',jsonb_build_object('id',b)));assert r ? 'error','learner cannot self-complete';
+ r:=public.peer_gateway(jsonb_build_object('op','complete','actor',tutor,'data',jsonb_build_object('id',b)));assert r ? 'error','cannot complete before end';
+ update peer.bookings set payload=payload||jsonb_build_object('date',now()-interval '2 hours') where id=b;
+ r:=public.peer_gateway(jsonb_build_object('op','complete','actor',tutor,'data',jsonb_build_object('id',b)));assert r->>'ok'='true','provider completion after end';
+ r:=public.peer_gateway(jsonb_build_object('op','review','actor',learner,'data',jsonb_build_object('id',b,'clarity',5,'usefulness',5,'recommend',5,'comment','done')));assert r->>'ok'='true','eligible review';
+ r:=public.peer_gateway(jsonb_build_object('op','file_access','actor',stranger,'data',jsonb_build_object('order',b)));assert r->>'status'='404','private file gate';
+ r:=public.peer_gateway(jsonb_build_object('op','listing_visibility','actor',stranger,'data',jsonb_build_object('id',l,'published',false)));assert r->>'status'='404','listing ownership';
+ r:=public.peer_gateway(jsonb_build_object('op','book','actor',null,'data',d));assert r->>'status'='403','anonymous write denied';
+ assert not has_function_privilege('anon','public.peer_gateway(jsonb)','EXECUTE'),'no anonymous RPC';
+ assert not has_function_privilege('authenticated','public.peer_gateway(jsonb)','EXECUTE'),'no client RPC';
+end $$;
+rollback;

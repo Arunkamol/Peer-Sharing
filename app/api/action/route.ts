@@ -1,3 +1,4 @@
+import {liveEnabled,liveAction} from '@/lib/live-backend';
 import {db,owner,safeRequest,getListing,emit,fail,rows,parse} from '@/lib/server';
 import {z} from 'zod';
 import {chatAction,getConversation,conversationStatus} from '@/lib/chat-server';
@@ -8,6 +9,7 @@ const validId=z.string().min(1).max(120);
 export async function POST(req:Request){try{
  safeRequest(req);const user=owner(req);if(Number(req.headers.get('content-length'))>30000)return Response.json({error:'Too much data'},{status:413});
  const {action,data}=await req.json() as {action:string;data:any};const now=Date.now();
+ if(liveEnabled())return await liveAction(action,data,user);
  const chat=await chatAction(action,data,user);if(chat)return chat;
  if(action==='profile'){
  const p=z.object({name:short,faculty:short,year:z.string().max(30),email:z.string().email().max(150).or(z.literal('')),bio:z.string().max(1000),subjects:z.array(z.string().max(60)).max(10),provider:z.boolean(),consent:z.literal(true)}).parse(data);

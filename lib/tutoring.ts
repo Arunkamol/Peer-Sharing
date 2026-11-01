@@ -1,8 +1,8 @@
 import {catalog, type Listing} from './catalog';
 
 export type TimeSlot = {date:string; remaining:number};
-export type Conversation = {id:string; item:string; slotDate:string; updated:number; unread?:number; preview?:string};
-export type ChatMessage = {id:string; role:'learner'|'sample_tutor'|'system'; body:string; created:number};
+export type Conversation = {id:string; item:string; slotDate:string; updated:number; unread?:number; preview?:string;providerView?:boolean;peerName?:string};
+export type ChatMessage = {id:string; role:'learner'|'sample_tutor'|'tutor'|'system'; body:string; created:number;mine?:boolean};
 export const isSampleTutor = (item:Listing) => catalog.some(c => c.id===item.id);
 
 // Sample tutors repeat on these Bangkok weekdays. User-created classes retain their scheduled date.
@@ -26,7 +26,7 @@ export function timeSlots(item:Listing, orders:any[]=[], now=Date.now()):TimeSlo
       if(schedule.days.includes(day)&&date.getTime()>now+30*60000)dates.push(date.toISOString());
     }
   }else if(new Date(item.date).getTime()>now+30*60000)dates=[new Date(item.date).toISOString()];
-  return dates.map(date=>({date,remaining:Math.max(0,item.seats-item.filled-orders.filter(o=>o.item===item.id&&new Date(o.date).getTime()===new Date(date).getTime()&&!['cancelled','refunded'].includes(o.status)).reduce((sum,o)=>sum+Number(o.seats),0))}));
+  return dates.map(date=>({date,remaining:Math.max(0,item.seats-item.filled-(item.live?0:orders.filter(o=>o.item===item.id&&new Date(o.date).getTime()===new Date(date).getTime()&&!['cancelled','refunded'].includes(o.status)).reduce((sum,o)=>sum+Number(o.seats),0)))}));
 }
 export function tutorReviews(item:Listing, reviews:any[]){
   const actual=reviews.filter(r=>r.item===item.id).map(r=>({...r,score:(r.clarity+r.usefulness+r.recommend)/3,sample:false}));

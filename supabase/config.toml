@@ -1,0 +1,3 @@
+[functions.peer-api]
+verify_jwt = false
+# Every request is authenticated with a short-lived ECDSA signature from Sites.

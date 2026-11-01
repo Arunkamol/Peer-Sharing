@@ -1,2 +1,4 @@
 import PeerApp from './peer-app';
-export default function Home(){ return <PeerApp/>; }
+import {liveEnabled} from '@/lib/live-backend';
+export const dynamic='force-dynamic';
+export default function Home(){return <PeerApp liveMode={liveEnabled()}/>;}
