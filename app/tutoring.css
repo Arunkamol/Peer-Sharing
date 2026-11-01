@@ -1,0 +1,141 @@
+/* Peer Sharing: a focused discovery → tutor → conversation journey. */
+.discovery-home { max-width: 1160px; }
+.home-controls { display: flex; gap: 16px; align-items: center; margin: 0 0 30px; }
+.home-search { display: flex; align-items: center; gap: 13px; flex: 1; padding: 14px 18px; min-width: 0; border: 1px solid #fff; border-radius: 18px; background: #ffffffbd; color: #9c7489; box-shadow: 0 3px 16px #39233304; }
+.home-search input { width: 100%; min-width: 0; border: 0; background: transparent; box-shadow: none; color: #3b333e; font-size: 15px; }
+.home-search input::placeholder { color: #8b7f8f; }
+.home-search button { display: grid; place-items: center; border: 0; background: none; }
+.home-mode { height: 46px !important; gap: 2px; padding: 4px; border-radius: 15px; border: 1px solid white; background: #eae3eb80; }
+.home-mode button { padding: 8px 15px; gap: 8px; border-radius: 11px; font-size: 14px; font-weight: 500; color: #746575; }
+.home-mode button[data-state='active'] { color: #ac2f68; background: #fff; box-shadow: 0 2px 9px #5d25440d; }
+.home-results-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 13px; }
+.home-results-heading h2 { font-size: 21px; font-weight: 600; letter-spacing: -.25px; }
+.result-sort { display: flex; gap: 14px; }
+.result-sort button { font-size: 13px; color: #807483; background: none; border: none; padding: 5px 0; }
+.result-sort button.selected { color: #ad2e65; font-weight: 600; }
+.discovery-home .course-tabs { margin-bottom: 24px; }
+.notes-heading { margin-top: 38px; }
+.discovery-home .resource-strip { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.text-back { border: 0; background: transparent; color: #866177; padding: 0 0 24px; font-size: 14px; }
+.tutor-layout { display: grid; grid-template-columns: minmax(0,1fr) 285px; gap: 30px; align-items: start; max-width: 1180px; }
+.tutor-main { min-width: 0; }
+.tutor-identity { display: flex; gap: 24px; align-items: center; padding: 7px 0 30px; }
+.tutor-avatar { width: 100px; height: 100px; display: grid; place-items: center; flex-shrink: 0; border-radius: 30px; background: linear-gradient(145deg,#fdeaf3,#e8d7e5); color: #a23868; font-size: 42px; font-weight: 500; border: 3px solid #fff; box-shadow: 0 5px 20px #4c203409; }
+.tutor-eyebrow,.booking-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .06em; color: #9d5477; }
+.tutor-identity h1 { font-size: 31px; font-weight: 600; letter-spacing: -.4px; line-height: 1.4; margin: 5px 0; }
+.tutor-identity p { font-size: 14px; color: #817286; }
+.tutor-rating { display: flex; align-items: center; gap: 7px; color: #b27734; font-size: 14px; margin-top: 10px; flex-wrap: wrap; }
+.tutor-rating strong { color: #38303e; }
+.tutor-rating > span:not(.sample-label) { color: #817286; }
+.sample-label { display: inline-flex; padding: 2px 8px; border-radius: 6px; background: #ede8f0; color: #7f7087; font-size: 12px; font-weight: 400; }
+.tutor-section { padding: 28px 0; border-top: 1px solid #4f325312; }
+.tutor-section h2 { font-size: 22px; font-weight: 600; color: #37303c; line-height: 1.5; }
+.tutor-section p { font-size: 16px; line-height: 1.9; color: #76667c; }
+.course-overview h2 { margin: 9px 0 13px; }
+.subject-code { color: #a8396a; font-size: 13px; }
+.tutor-facts { display: flex; flex-wrap: wrap; gap: 13px 22px; padding: 20px 0; color: #7b6b83; font-size: 14px; }
+.tutor-facts span { display: inline-flex; align-items: center; gap: 7px; }
+.tutor-facts svg { flex-shrink: 0; color: #ad6e8b; }
+.tutor-section h3 { font-size: 16px; font-weight: 600; margin-top: 8px; }
+.learning-outcomes { padding: 12px 0 0; display: grid; gap: 9px; list-style: none; margin: 0; }
+.learning-outcomes li { display: flex; gap: 10px; align-items: flex-start; color: #76667c; font-size: 15px; }
+.learning-outcomes svg { margin-top: 4px; flex-shrink: 0; color: #b6567f; }
+.tutor-section .preparation { display: flex; gap: 10px; margin-top: 23px; padding: 15px 17px; background: #fff9; border-radius: 15px; font-size: 14px; }
+.preparation svg { flex-shrink: 0; margin-top: 5px; color: #ac7592; }
+.preparation strong { display: block; color: #614569; font-weight: 500; }
+.tutor-section-heading { display: flex; gap: 14px; align-items: center; justify-content: space-between; }
+.tutor-section-heading p { font-size: 13px; margin-top: 5px; }
+.tutor-section-heading > svg { color: #b3698c; flex-shrink: 0; }
+.week-switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 20px 0 15px; font-size: 13px; }
+.week-switch button { padding: 7px 0; color: #93657f; border: 0; background: none; }
+.week-switch strong { font-weight: 500; }
+.availability-grid { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 6px; }
+.availability-day { min-height: 118px; text-align: center; padding: 12px 4px 8px; border-radius: 13px; border: 1px solid #fff; background: #ffffff85; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.availability-day > span:first-child { font-size: 12px; color: #88778d; }
+.availability-day > strong { font-size: 17px; font-weight: 500; color: #4e4258; margin-bottom: 6px; }
+.time-slot { padding: 5px 3px; min-height: 32px; width: 100%; border-radius: 8px; border: 1px solid #eed0df; background: #fff5fa; color: #a53466; font-size: 12px; }
+.time-slot.selected { background: #b83770; color: white; border-color: #b83770; box-shadow: 0 3px 8px #b8377023; }
+.time-slot:disabled { background: #eeeaf0; border-color: transparent; color: #9f91a6; }
+.unavailable-slot { font-size: 14px; color: #b9acbf; padding: 5px 0; }
+.tutor-section .calendar-hint { font-size: 12px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 14px; }
+.calendar-hint strong { color: #a43d6b; font-weight: 500; margin-left: auto; }
+.availability-key { width: 10px; height: 10px; border: 1px solid #df8fb3; background: #fae6f0; border-radius: 3px; }
+.tutor-booking-card { position: sticky; top: 115px; padding: 25px; background: linear-gradient(150deg,#fffffff2,#fff8fdd9); border: 1px solid white; border-radius: 24px; box-shadow: 0 12px 45px #63314808; }
+.hourly-price { font-size: 33px; font-weight: 600; color: #a83267; letter-spacing: -.6px; margin-top: 10px; line-height: 1.5; }
+.hourly-price span { display: block; font-size: 14px; letter-spacing: 0; font-weight: 400; color: #856e8a; }
+.tutor-booking-card > p { font-size: 13px; color: #88738e; margin-top: 10px; }
+.booking-selection { display: flex; gap: 12px; align-items: center; padding: 20px 0; margin: 17px 0; border-block: 1px solid #5137590d; color: #a8537d; }
+.booking-selection strong { display: block; font-size: 14px; font-weight: 500; color: #5b4664; }
+.booking-selection span { display: block; font-size: 13px; margin-top: 4px; color: #8c768f; }
+.booking-footnote { font-size: 12px !important; line-height: 1.7 !important; color: #8a7692 !important; margin: 12px 0; }
+.booking-rule { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; color: #7d6886; margin: 16px 0 0; }
+.booking-rule svg { flex-shrink: 0; color: #ad7095; margin-top: 3px; }
+.tutor-review { padding: 23px 0; border-bottom: 1px solid #50305b0a; }
+.tutor-review:last-child { border-bottom: 0; }
+.review-author { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; font-size: 14px; }
+.review-author strong { font-weight: 500; }
+.review-author .avatar { width: 31px; height: 31px; font-size: 12px; }
+.review-stars { display: flex; gap: 2px; margin-left: auto; color: #c89555; }
+.tutor-review p { font-size: 14px; margin-top: 12px; }
+.chat-heading { display: flex; justify-content: space-between; gap: 15px; align-items: center; margin: 0 0 24px; }
+.chat-heading h1 { font-size: 29px; font-weight: 600; letter-spacing: -.5px; }
+.chat-heading p { font-size: 14px; color: #89798e; margin-top: 5px; }
+.chat-workspace { display: grid; grid-template-columns: 195px minmax(260px,1fr) 250px; min-height: 620px; background: #ffffffa8; border: 1px solid white; border-radius: 23px; box-shadow: 0 7px 30px #47234505; overflow: hidden; }
+.conversation-list { background: #f9f6fb8c; border-right: 1px solid #4a225509; padding: 20px 10px; min-width: 0; }
+.conversation-label { font-size: 12px; color: #95819f; padding: 0 10px 15px; }
+.conversation-row { width: 100%; display: flex; align-items: center; gap: 9px; border: 1px solid transparent; background: none; padding: 12px 8px; text-align: left; border-radius: 13px; margin-bottom: 5px; }
+.conversation-row.active { background: #fae5f0; border-color: #fff; }
+.conversation-row .avatar { width: 30px; height: 30px; }
+.conversation-row > span:nth-child(2) { min-width: 0; }
+.conversation-row strong { display: block; font-size: 14px; font-weight: 500; color: #695173; }
+.conversation-row small { display: block; font-size: 12px; color: #9b829f; max-width: 112px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conversation-row > svg { margin-left: auto; flex-shrink: 0; color: #ad6289; }
+.conversation-empty { padding: 20px 12px; font-size: 13px; color: #9c88a4; }
+.conversation-empty p { margin-top: 10px; }
+.conversation-profile-link { font-size: 13px; color: #ac3e71; padding: 12px 10px; border: 0; background: none; }
+.chat-thread { display: flex; flex-direction: column; min-width: 0; height: 650px; }
+.chat-thread-header { display: flex; gap: 12px; align-items: center; padding: 19px 22px; border-bottom: 1px solid #4d2b520a; }
+.chat-thread-header > div { min-width: 0; }
+.chat-thread-header h2 { font-size: 16px; font-weight: 600; color: #4e395a; }
+.chat-thread-header p { font-size: 12px; color: #95809e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-thread-header .icon-button { margin-left: auto; flex-shrink: 0; }
+.chat-preview-note { background: #faf4f8; color: #987888; padding: 8px 19px; font-size: 12px; line-height: 1.7; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 22px; display: flex; flex-direction: column; gap: 18px; scrollbar-width: thin; scrollbar-color: #d9c4d8 transparent; }
+.chat-message { display: flex; flex-direction: column; align-items: flex-start; max-width: 90%; }
+.chat-message.own { align-self: flex-end; align-items: flex-end; }
+.chat-author { color: #a48aaa; font-size: 12px; margin: 0 0 5px 2px; }
+.chat-bubble { background: #f1edf4; border-radius: 17px 17px 17px 4px; padding: 12px 15px; color: #604a6b; font-size: 15px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-message.own .chat-bubble { background: #b73770; color: #fff; border-radius: 17px 17px 4px 17px; }
+.chat-message time { font-size: 12px; color: #ad99b6; margin: 5px 3px 0; }
+.chat-system { text-align: center; padding: 8px 10px; font-size: 12px; line-height: 1.8; color: #a08aa7; background: #faf6fc; border-radius: 12px; overflow-wrap: anywhere; }
+.chat-composer { display: flex; align-items: flex-end; gap: 10px; margin: 0 18px 18px; padding: 8px; border: 1px solid #e9deeb; border-radius: 23px; background: #fff; }
+.chat-composer textarea { flex: 1; min-width: 0; min-height: 41px; max-height: 120px; resize: vertical; padding: 9px 7px; border: 0; outline: none; box-shadow: none; font-size: 14px; background: none; color: #594063; }
+.chat-composer:focus-within { border-color: #ca6995; box-shadow: 0 0 0 3px #d581a41a; }
+.send-button { min-height: 41px; width: 41px; height: 41px; flex-shrink: 0; padding: 10px; }
+.chat-start { padding: 20px; text-align: center; }
+.chat-booking { border-left: 1px solid #4d2b520a; padding: 24px 20px; background: #fff9; }
+.chat-booking h2 { font-size: 17px; line-height: 1.7; font-weight: 550; color: #594363; margin: 10px 0 4px; }
+.booking-course-code { font-size: 12px; color: #a17faa; }
+.chat-price { color: #ae3d73; font-size: 27px; font-weight: 600; margin-top: 18px; }
+.chat-price small { display: block; font-size: 12px; font-weight: 400; color: #95809e; }
+.booking-duration { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #8a7593; margin: 13px 0 20px; }
+.booking-field-label { display: block; font-size: 13px; color: #785d82; margin: 16px 0 7px; }
+.booking-select { width: 100%; min-height: 41px; height: auto; padding: 9px 11px; font-size: 13px; border: 1px solid #ebdfec; border-radius: 11px; background: #fff; box-shadow: none; }
+.booking-select span { white-space: normal; text-align: left; }
+.booking-total { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ede4ef; padding: 15px 0; font-size: 14px; color: #7e638b; }
+.booking-total strong { font-size: 20px; color: #aa3e72; }
+.confirmed-booking { display: grid; gap: 10px; padding: 20px 0; color: #945877; font-size: 13px; }
+.confirmed-booking strong { font-size: 16px; }
+.booking-summary { display: grid; gap: 12px; }
+.booking-summary > div { display: flex; justify-content: space-between; gap: 20px; padding: 10px 0; border-bottom: 1px solid #eee5ef; font-size: 14px; }
+.booking-summary dt { color: #907798; flex-shrink: 0; }
+.booking-summary dd { color: #62466e; text-align: right; }
+.notification-heading { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 16px; }
+.notification-heading h2 { font-size: 20px; }
+.notification { border-radius: 12px; }
+.notification.unread { background: #fcf1f7; }
+.notification > .btn-plain { font-size: 13px; display: block; margin-top: 7px; }
+@media(max-width:1400px) { .chat-workspace { grid-template-columns: 165px minmax(250px,1fr) 220px; } .chat-booking { padding: 20px 15px; } }
+@media(max-width:1220px) { .chat-workspace { grid-template-columns: minmax(0,1fr) 230px; } .conversation-list { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; overflow-x: auto; padding: 8px; border-right: 0; border-bottom: 1px solid #4d2b520a; scrollbar-width: none; } .conversation-label,.conversation-empty { display: none; } .conversation-row { width: auto; flex: 0 0 auto; padding: 8px 10px; margin: 0; } .conversation-row small,.conversation-row > svg { display: none; } .conversation-profile-link { flex-shrink: 0; margin-left: auto; } .tutor-layout { grid-template-columns: minmax(0,1fr) 250px; gap: 24px; } .tutor-booking-card { padding: 21px; } .discovery-home .resource-strip { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:1000px) { .tutor-layout { grid-template-columns: minmax(0,1fr); } .tutor-booking-card { position: static; grid-row: 2; } .home-controls { flex-wrap: wrap; } .home-search { flex-basis: 100%; } .home-mode { width: 100%; } .home-controls > div { width: 100%; } .home-mode button { flex: 1; } .chat-workspace { grid-template-columns: minmax(0,1fr); } .chat-booking { border-left: 0; border-top: 1px solid #4d2b520a; } .chat-thread { height: 570px; } }
+@media(max-width:640px) { .content:has(.chat-page) { padding-inline: 12px; } .home-controls { gap: 11px; margin-bottom: 26px; } .home-search { border-radius: 15px; padding: 13px 14px; } .home-search input { font-size: 14px; } .home-results-heading h2 { font-size: 19px; } .result-sort { gap: 11px; } .home-results-heading { gap: 10px; } .result-sort button { font-size: 12px; white-space: nowrap; } .discovery-home .resource-strip { grid-template-columns: minmax(0,1fr); } .tutor-identity { gap: 16px; padding-bottom: 24px; } .tutor-avatar { width: 77px; height: 77px; border-radius: 24px; font-size: 32px; } .tutor-identity h1 { font-size: 27px; } .tutor-eyebrow { font-size: 12px; } .tutor-identity p { font-size: 13px; } .tutor-section h2 { font-size: 20px; } .tutor-section { padding-block: 24px; } .tutor-facts { gap: 13px; } .availability-grid { gap: 4px; } .availability-day { border-radius: 10px; padding-inline: 2px; min-height: 108px; } .availability-day strong { font-size: 16px; } .time-slot { font-size: 12px; padding-inline: 1px; } .week-switch { font-size: 12px; } .calendar-hint strong { width: 100%; margin-left: 0; } .chat-heading { padding-inline: 5px; } .chat-heading h1 { font-size: 26px; } .chat-heading p { font-size: 13px; } .chat-workspace { border-radius: 20px; } .chat-thread-header { padding: 15px; } .chat-thread { height: 550px; } .chat-messages { padding: 17px 14px; } .chat-bubble { font-size: 14px; } .chat-composer { margin: 0 10px 12px; } .chat-booking { padding: 24px; } .notification-heading { align-items: center; } .notification-heading h2 { font-size: 18px; } .notification-heading .btn { font-size: 12px; } }

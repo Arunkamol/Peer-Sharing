@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1790865007887,
+      "tag": "0000_empty_doctor_strange",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791528786292,
+      "tag": "0001_stale_marauders",
+      "breakpoints": true
+    }
+  ]
+}
