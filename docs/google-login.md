@@ -1,10 +1,10 @@
 # Google sign-in activation
 
-The Google login implementation is deployed alongside the original Sites-managed
-ChatGPT login. Google is **not active** until the project owner configures the
-provider in Supabase. `/api/auth/options` reads Supabase's provider readiness, with
-a 30-second server cache. Until enabled, the login screen shows Google as coming
-soon and keeps ChatGPT available. No fake login is performed.
+The login page offers Google sign-in only. Google requires the project owner to
+configure the provider in Supabase. `/api/auth/options` reads Supabase's provider
+readiness, with a 30-second server cache. When unavailable, the login screen
+disables the Google button and asks users to try again later. No fake login is
+performed. Existing Sites-managed sessions remain supported by the backend.
 
 ## Owner setup
 

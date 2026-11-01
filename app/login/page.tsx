@@ -31,13 +31,12 @@ export default function Login() {
       <p className="login-eyebrow">GROW TOGETHER</p>
       <h1 id="login-title">{t('ยินดีต้อนรับกลับมา','Welcome to your community')}</h1>
       <p className="login-intro">{t('เรียนรู้ แบ่งปัน และเก่งขึ้นไปด้วยกัน','Learn something new. Share what you know.')}</p>
-      {error && <p className="login-error" role="alert">{error === 'cancelled' ? t('คุณยกเลิกการเข้าสู่ระบบ ลองอีกครั้งได้เมื่อพร้อม','Sign-in was cancelled. Try again when you’re ready.') : error === 'unavailable' ? t('Google ยังไม่พร้อมใช้งาน กรุณาใช้ ChatGPT ในตอนนี้','Google sign-in isn’t available yet. You can use ChatGPT for now.') : t('เข้าสู่ระบบไม่สำเร็จ กรุณาเริ่มใหม่อีกครั้ง','We couldn’t finish signing you in. Please start again.')}</p>}
+      {error && <p className="login-error" role="alert">{error === 'cancelled' ? t('คุณยกเลิกการเข้าสู่ระบบ ลองอีกครั้งได้เมื่อพร้อม','Sign-in was cancelled. Try again when you’re ready.') : error === 'unavailable' ? t('ขณะนี้ไม่สามารถเข้าสู่ระบบด้วย Google ได้ กรุณาลองอีกครั้งภายหลัง','Google sign-in is currently unavailable. Please try again later.') : t('เข้าสู่ระบบไม่สำเร็จ กรุณาเริ่มใหม่อีกครั้ง','We couldn’t finish signing you in. Please start again.')}</p>}
       <div className="login-options">
         {google ? <a className="login-provider login-google" href={'/auth/google?next=' + encodeURIComponent(next)} target="_top"><GoogleMark/><span>{t('ดำเนินการต่อด้วย Google','Continue with Google')}</span><ArrowRight size={17}/></a> : <button className="login-provider login-google" disabled aria-describedby="google-status"><GoogleMark/><span>{t('ดำเนินการต่อด้วย Google','Continue with Google')}</span></button>}
-        {!google && <p id="google-status" className="login-provider-note" aria-live="polite">{google === null ? t('กำลังตรวจสอบ…','Checking availability…') : t('เร็ว ๆ นี้ · ใช้ ChatGPT ได้ในระหว่างนี้','Coming soon · ChatGPT is available now')}</p>}
-        <form action="/auth/signout" method="post" target="_top"><input type="hidden" name="intent" value="chatgpt"/><input type="hidden" name="next" value={next}/><button type="submit" className="login-provider"><span className="chatgpt-mark" aria-hidden="true">✳</span><span>{t('ดำเนินการต่อด้วย ChatGPT','Continue with ChatGPT')}</span><ArrowRight size={17}/></button></form>
+        {!google && <p id="google-status" className="login-provider-note" aria-live="polite">{google === null ? t('กำลังตรวจสอบ…','Checking availability…') : t('Google ยังไม่พร้อมใช้งาน กรุณาลองอีกครั้งภายหลัง','Google sign-in is unavailable. Please try again later.')}</p>}
       </div>
-      <p className="login-footnote">{t('ใช้วิธีเข้าสู่ระบบเดิมเพื่อกลับมาที่โปรไฟล์และรายการของคุณ','Use the same sign-in method to return to your profile and bookings.')}</p>
+      <p className="login-footnote">{t('เข้าสู่ระบบด้วยบัญชี Google เพื่อเข้าถึงโปรไฟล์และรายการของคุณ','Sign in with your Google account to access your profile and bookings.')}</p>
       <a className="login-browse" href="/">{t('สำรวจโดยไม่เข้าสู่ระบบ','Keep exploring without signing in')}<ArrowRight size={15}/></a>
     </section>
     <p className="login-bottom">{t('พื้นที่เล็ก ๆ สำหรับการเรียนรู้ที่ยิ่งใหญ่','A little space for big possibilities.')}</p>

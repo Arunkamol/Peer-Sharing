@@ -44,7 +44,7 @@ Runtime keys are `PEER_BACKEND_URL` and secret `PEER_BACKEND_SIGNING_KEY`. Never
 
 ## Google login
 
-Google sign-in support is prepared alongside ChatGPT sign-in. The Google provider
-is disabled until its owner-configured OAuth client is saved in Supabase. See
+The login page offers Google sign-in only. Google availability follows the
+owner-configured OAuth provider in Supabase. See
 [the activation guide](docs/google-login.md) for exact origins, callback URLs and
 testing steps. Existing ChatGPT records retain their original account IDs.
