@@ -240,3 +240,32 @@ html { scroll-padding-top: 110px; }
 .auth-header-link{white-space:nowrap;min-height:40px;padding:8px 14px}
 .auth-profile-actions{display:flex;justify-content:flex-end;margin-bottom:16px}
 @media(max-width:480px){.auth-header-link{padding:8px 11px;font-size:12px}}
+
+/* Account modes share one identity; each mode keeps its own navigation. */
+.portal-mode-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 22px}
+.portal-mode-label{font-size:12px;color:#9a7f9f}
+.portal-switch{display:inline-flex;gap:4px;padding:4px;border:1px solid #f0dce8;border-radius:999px;background:#f5eaf180}
+.portal-switch button{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;min-height:42px;border:0;border-radius:999px;background:transparent;color:#917d96;font-size:12px;cursor:pointer;transition:background .15s,box-shadow .15s,color .15s}
+.portal-switch button[aria-pressed=true]{background:#fff;color:#b74e80;box-shadow:0 2px 8px #7a3d6210,inset 0 1px 0 #fff;font-weight:600}
+.portal-switch button:focus-visible{outline:3px solid #d692b4;outline-offset:2px}
+.portal-switch svg{flex-shrink:0}
+.provider-signin{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.faculty-filter{display:flex;align-items:center;gap:12px;margin-bottom:24px;min-width:0}
+.faculty-filter>span{font-size:12px;color:#9a7f9f;flex-shrink:0}
+.faculty-filter-select{width:min(100%,350px)!important;min-width:0!important;max-width:100%;white-space:normal!important;text-align:left}
+.form .faculty-select{width:100%!important;min-width:0!important;height:auto!important;min-height:44px;white-space:normal!important;text-align:left;line-height:1.6}
+.faculty-select [data-slot=select-value],.faculty-filter-select [data-slot=select-value]{display:block!important;line-clamp:unset;-webkit-line-clamp:unset;overflow-wrap:anywhere}
+.faculty-help{display:block;font-size:11px;line-height:1.7;font-weight:400;color:#a38ba9;margin-top:7px}
+.faculty-menu{z-index:80!important;max-height:min(340px,var(--radix-select-content-available-height))!important;max-width:calc(100vw - 32px);width:var(--radix-select-trigger-width)}
+.faculty-menu [data-slot=select-item]{white-space:normal;line-height:1.6;padding-top:9px;padding-bottom:9px;overflow-wrap:anywhere}
+.listing-cover:has(.cover-title.faculty-cover) .cover-course{overflow-wrap:anywhere}
+.cover-title.faculty-cover{font-size:clamp(18px,1.7vw,26px);line-height:1.5;overflow-wrap:anywhere}
+@media(max-width:640px){.portal-mode-bar{flex-direction:column;align-items:stretch;gap:8px;margin-bottom:18px}.portal-mode-label{font-size:11px}.portal-switch{display:flex;width:100%}.portal-switch button{flex:1;padding:9px 10px;font-size:12px;min-width:0}.faculty-filter{margin-bottom:20px}.faculty-filter-select{flex:1;width:auto!important;height:auto!important;min-height:44px}.cover-title.faculty-cover{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.portal-switch button{transition:none}}
+/* Buyer checkout follows the same soft pink glass controls as the marketplace. */
+.card-purchase-action{padding:0 20px 18px}.card-purchase-action .btn{min-height:38px}
+.purchase-checkout{display:grid;gap:20px;min-width:0}.purchase-steps{display:flex;list-style:none;gap:12px;padding:0;margin:0 0 4px;color:#958691;font-size:12px}.purchase-steps li{display:flex;align-items:center;gap:7px;flex:1}.purchase-steps li>span{display:grid;place-items:center;width:24px;height:24px;border:1px solid #e5dae2;border-radius:50%;flex-shrink:0}.purchase-steps li.current{color:#9f3b71;font-weight:600}.purchase-steps li.current>span,.purchase-steps li.done>span{background:#f9e5ef;border-color:#eac0d4;color:#a54275}
+.purchase-item{display:flex;gap:14px;align-items:center;padding:16px;border-radius:20px;background:#fcf8fb;border:1px solid #f0e5ed}.purchase-item-icon{display:grid;place-items:center;width:54px;height:62px;flex-shrink:0;border-radius:12px}.purchase-item h3{font-size:16px;line-height:1.55;margin:0 0 4px}.purchase-item p{font-size:12px;color:#857582;line-height:1.6;margin:0}.purchase-quantity{display:flex;align-items:center;justify-content:space-between;gap:16px}.purchase-quantity select{width:88px}.purchase-field{display:grid;gap:8px;font-size:13px}.purchase-field select{min-width:0;max-width:100%}
+.purchase-totals{margin:0;display:grid;gap:12px;text-align:left}.purchase-totals>div{display:flex;align-items:baseline;justify-content:space-between;gap:20px}.purchase-totals dt{font-size:13px;color:#857582}.purchase-totals dd{margin:0;font-weight:600}.purchase-grand-total{padding-top:16px;border-top:1px solid #eee4eb}.purchase-grand-total dt{font-size:15px;color:#40323e}.purchase-grand-total dd{font-size:25px;color:#a54275}.purchase-payment{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}.purchase-payment h3{margin:0;font-size:18px}.purchase-payment p{max-width:350px;font-size:12px;line-height:1.8;color:#857582;margin:0}.purchase-amount{font-size:32px;color:#a54275}.purchase-qr{display:grid;place-items:center;background:white;padding:12px;border:1px solid #eadde6;border-radius:22px;box-shadow:0 8px 30px #9c487010;max-width:100%;min-height:220px}.purchase-qr img{display:block;width:min(256px,100%);height:auto}.purchase-reference{font-size:11px;color:#94818e;letter-spacing:.06em;overflow-wrap:anywhere}.purchase-receipt{display:grid;gap:16px;text-align:center}.purchase-receipt h3{font-size:19px;margin:0}.purchase-receipt .pill{justify-self:center}.purchase-success-icon{width:64px;height:64px;background:#f9e7f0;color:#a54275;border-radius:50%;display:grid;place-items:center;justify-self:center}.purchase-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.purchase-receipt .notice{font-size:12px;text-align:left}.purchase-checkout .btn{min-height:44px}.purchase-checkout .notice{font-size:12px;line-height:1.8;margin:0}.purchase-checkout select:focus-visible{outline:2px solid #b34f83;outline-offset:3px}
+.tutor-booking-card>.btn+.btn{margin-top:10px}
+@media(max-width:640px){.purchase-steps{gap:6px;font-size:10px}.purchase-steps li{gap:5px}.purchase-steps li>span{width:21px;height:21px}.purchase-item{padding:12px;gap:10px}.purchase-item h3{font-size:14px}.purchase-actions{flex-direction:column}.purchase-actions .btn{width:100%}.card-purchase-action{padding:0 14px 14px}}

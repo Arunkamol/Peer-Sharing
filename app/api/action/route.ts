@@ -4,12 +4,14 @@ import {db,owner,safeRequest,getListing,emit,fail,rows,parse} from '@/lib/server
 import {z} from 'zod';
 import {chatAction,getConversation,conversationStatus} from '@/lib/chat-server';
 import {timeSlots} from '@/lib/tutoring';
+import {demoCheckoutAction} from '@/lib/demo-checkout-server';
 const short=z.string().trim().min(1).max(200);
 const long=z.string().trim().min(1).max(3000);
 const validId=z.string().min(1).max(120);
 async function handlePOST(req:Request){try{
  safeRequest(req);const user=await owner(req);if(Number(req.headers.get('content-length'))>30000)return Response.json({error:'Too much data'},{status:413});
  const {action,data}=await req.json() as {action:string;data:any};const now=Date.now();
+ const demo=await demoCheckoutAction(action,data,user);if(demo)return demo;
  if(liveEnabled())return await liveAction(action,data,user);
  const chat=await chatAction(action,data,user);if(chat)return chat;
  if(action==='profile'){
