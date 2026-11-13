@@ -288,3 +288,27 @@ html { scroll-padding-top: 110px; }
 .campus-ribbon-photos{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:10px}.campus-ribbon figure{margin:0;position:relative;height:166px;border-radius:15px;overflow:hidden}.campus-ribbon img{width:100%;height:100%;object-fit:cover}.campus-ribbon figcaption{position:absolute;inset:auto 0 0;padding:24px 10px 10px;background:linear-gradient(transparent,rgba(25,20,25,.75));color:white;font-size:10px;line-height:1.5}.photo-credits{font-size:10px;line-height:1.8;color:#927f8c;margin:24px 0}.photo-credits a{color:#9c537a;text-decoration:underline;text-underline-offset:3px}.campus-image-fallback{display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#947083;background:#f4e9f0;font-size:12px;padding:20px}
 @media(max-width:700px){.campus-ribbon{grid-template-columns:1fr;padding:18px;gap:16px;margin-bottom:22px}.campus-ribbon-title h2{font-size:20px;margin:6px 0}.campus-ribbon figure{height:126px}.campus-ribbon-photos{gap:7px}.campus-ribbon figcaption{font-size:9px;padding:20px 7px 8px}.listing-photo-detail{height:210px}.listing-cover.photographic-cover{height:180px}}
 @media(prefers-reduced-motion:reduce){.listing-photo img{transition:none}}
+
+/* Keep the bookmark overlay anchored to the card, not in the glass control flow. */
+.listing-card > .save-button {
+  position: absolute;
+  top: 17px;
+  right: 17px;
+  left: auto;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  z-index: 3;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.95);
+  background: rgba(255,255,255,.93);
+  color: #6e5365;
+  box-shadow: 0 3px 12px rgba(55,30,48,.12);
+}
+.listing-card > .save-button svg { width: 18px; height: 18px; }
+.listing-card > .save-button.saved { background: #fce4ef; color: #b5316b; border-color: #f7bcd5; }
+.listing-card > .save-button:focus-visible { outline: 3px solid #bf467d; outline-offset: 2px; }
+.listing-card .photographic-cover .cover-course { right: 65px; max-width: calc(100% - 78px); }
+@media (max-width: 640px) { .listing-card > .save-button { top: 14px; right: 14px; } }
