@@ -3,6 +3,8 @@ import {liveEnabled,liveAction} from '@/lib/live-backend';
 import {db,owner,safeRequest,getListing,emit,fail,rows,parse} from '@/lib/server';
 import {z} from 'zod';
 import {chatAction,getConversation,conversationStatus} from '@/lib/chat-server';
+import {availabilityError,weeklyDates} from '@/lib/availability';
+import {availabilitySchema,courseCodeSchema} from '@/lib/listing-validation';
 import {timeSlots} from '@/lib/tutoring';
 import {demoCheckoutAction} from '@/lib/demo-checkout-server';
 const short=z.string().trim().min(1).max(200);
@@ -29,8 +31,10 @@ async function handlePOST(req:Request){try{
  const id=crypto.randomUUID();await db().prepare('INSERT INTO requests(id,owner,payload,status,created) VALUES(?,?,?,?,?)').bind(id,user,JSON.stringify({...p,followers:0,expires:Math.min(now+30*86400000,new Date(p.neededBy+'T23:59:59+07:00').getTime())}),'open',now).run();await emit(user,'notification',{text:'เผยแพร่คำขอบนบอร์ดตามหาแล้ว / Your request is on the board'},id);return Response.json({ok:true,id});
  }
  if(action==='close_request'){await db().prepare('UPDATE requests SET status=? WHERE id=? AND owner=?').bind('fulfilled',validId.parse(data.id),user).run();return Response.json({ok:true})}
+ if(action==='listing_schedule'){const p=z.object({id:validId,weeklyAvailability:availabilitySchema,courseCode:courseCodeSchema.optional()}).parse(data);const row=await db().prepare('SELECT * FROM listings WHERE id=? AND owner=?').bind(p.id,user).first<any>();if(!row)return Response.json({error:'Listing not found'},{status:404});const item=parse(row);const err=item.kind!=='class'?'Not a class':availabilityError(p.weeklyAvailability,item.duration);if(err)return Response.json({error:err},{status:400});const payload={...item,weeklyAvailability:p.weeklyAvailability,courseCode:p.courseCode??item.courseCode,date:weeklyDates(p.weeklyAvailability,item.duration)[0]};await db().prepare('UPDATE listings SET payload=? WHERE id=? AND owner=?').bind(JSON.stringify(payload),p.id,user).run();return Response.json({ok:true})}
  if(action==='listing'){
- const p=z.object({kind:z.enum(['class','digital','physical']),title:short,titleEn:z.string().max(200).optional(),course:short,description:long,price:z.number().min(0).max(50000),mode:z.enum(['online','onsite','digital']),date:z.string().max(50),duration:z.number().min(0).max(480),seats:z.number().int().min(1).max(100),minSeats:z.number().int().min(1).max(100),objectives:z.array(short).max(10),prep:z.string().max(1000),location:z.string().max(500),condition:z.string().max(100),fileKey:z.string().max(200).optional(),pages:z.number().int().min(0).max(1000).optional(),originality:z.literal(true),tutor:short}).parse(data);
+ const p=z.object({weeklyAvailability:availabilitySchema.optional(),courseCode:courseCodeSchema.optional(),kind:z.enum(['class','digital','physical']),title:short,titleEn:z.string().max(200).optional(),course:short,description:long,price:z.number().min(0).max(50000),mode:z.enum(['online','onsite','digital']),date:z.string().max(50),duration:z.number().min(0).max(480),seats:z.number().int().min(1).max(100),minSeats:z.number().int().min(1).max(100),objectives:z.array(short).max(10),prep:z.string().max(1000),location:z.string().max(500),condition:z.string().max(100),fileKey:z.string().max(200).optional(),pages:z.number().int().min(0).max(1000).optional(),originality:z.literal(true),tutor:short}).parse(data);
+ if(p.kind==='class'&&p.weeklyAvailability){const err=availabilityError(p.weeklyAvailability,p.duration);if(err)return Response.json({error:err},{status:400});p.date=weeklyDates(p.weeklyAvailability,p.duration)[0]||'';}
  if(p.kind==='class'&&(p.objectives.length<3||!p.date||new Date(p.date).getTime()<now||p.duration<15||p.minSeats>p.seats))return Response.json({error:'กรอกเป้าหมายอย่างน้อย 3 ข้อ วันเวลาในอนาคต และจำนวนที่นั่งที่ถูกต้อง'},{status:400});
  if(p.kind==='digital'&&!p.fileKey)return Response.json({error:'กรุณาแนบไฟล์ PDF / Please attach a PDF'},{status:400});
  if(p.fileKey){const f=await db().prepare('SELECT id FROM files WHERE id=? AND owner=?').bind(p.fileKey,user).first();if(!f)return Response.json({error:'File not found'},{status:400})}

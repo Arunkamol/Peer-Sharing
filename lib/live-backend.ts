@@ -1,5 +1,7 @@
 import {env} from 'cloudflare:workers';
 import {z} from 'zod';
+import {availabilityError,weeklyDates} from './availability';
+import {availabilitySchema,courseCodeSchema} from './listing-validation';
 
 type Config={PEER_BACKEND_URL?:string;PEER_BACKEND_SIGNING_KEY?:string};
 export const liveEnabled=()=>Boolean((env as Config).PEER_BACKEND_URL);
@@ -22,7 +24,8 @@ const schemas:Record<string,z.ZodTypeAny>={
   mark:z.object({target:id,kind:z.enum(['saved','follow','course']),on:z.boolean()}),
   request:z.object({title:short,course:short,type:z.enum(['class','digital','physical']),description:long,budget:z.number().min(0).max(50000),neededBy:z.string().regex(/^\d{4}-\d{2}-\d{2}$/),name:short}),
   close_request:z.object({id:uuid}),
-  listing:z.object({kind:z.enum(['class','digital','physical']),title:short,titleEn:z.string().max(200).optional(),course:short,description:long,price:z.number().min(0).max(50000),mode:z.enum(['online','onsite','digital']),date:z.string().max(50),duration:z.number().int().min(0).max(480),seats:z.number().int().min(1).max(100),minSeats:z.number().int().min(1).max(100),objectives:z.array(short).max(10),prep:z.string().max(1000),location:z.string().max(500),condition:z.string().max(100),fileKey:z.string().max(200).optional(),pages:z.number().int().min(0).max(1000).optional(),originality:z.literal(true),tutor:short}),
+  listing:z.object({weeklyAvailability:availabilitySchema.optional(),courseCode:courseCodeSchema.optional(),kind:z.enum(['class','digital','physical']),title:short,titleEn:z.string().max(200).optional(),course:short,description:long,price:z.number().min(0).max(50000),mode:z.enum(['online','onsite','digital']),date:z.string().max(50),duration:z.number().int().min(0).max(480),seats:z.number().int().min(1).max(100),minSeats:z.number().int().min(1).max(100),objectives:z.array(short).max(10),prep:z.string().max(1000),location:z.string().max(500),condition:z.string().max(100),fileKey:z.string().max(200).optional(),pages:z.number().int().min(0).max(1000).optional(),originality:z.literal(true),tutor:short}),
+  listing_schedule:z.object({id:uuid,weeklyAvailability:availabilitySchema,courseCode:courseCodeSchema.optional()}),
   listing_visibility:z.object({id:uuid,published:z.boolean()}),
   start_chat:z.object({item:uuid,slot:z.string().max(40).optional()}),
   chat_message:z.object({id:uuid,requestId:uuid,text:z.string().trim().min(1).max(2000)}),
@@ -39,6 +42,7 @@ export async function liveAction(action:string,data:unknown,user:string){
   const schema=schemas[action];
   if(!schema)return Response.json({error:'ฟังก์ชันนี้ยังไม่เปิดใช้งาน / This feature is not available for live accounts.'},{status:400});
   const payload=schema.parse(data);
+  if(action==='listing'&&payload.kind==='class'&&payload.weeklyAvailability){const err=availabilityError(payload.weeklyAvailability,payload.duration);if(err)return Response.json({error:err},{status:400});payload.date=weeklyDates(payload.weeklyAvailability,payload.duration)[0]||'';}
   const result=await liveCall(action,user,payload);
   return Response.json(result,{status:result.error?Number(result.status||400):200,headers:{'Cache-Control':'private, no-store'}});
 }

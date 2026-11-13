@@ -1,4 +1,5 @@
 import {catalog, type Listing} from './catalog';
+import {weeklyDates} from './availability';
 
 export type TimeSlot = {date:string; remaining:number};
 export type Conversation = {id:string; item:string; slotDate:string; updated:number; unread?:number; preview?:string;providerView?:boolean;peerName?:string};
@@ -17,7 +18,7 @@ export function timeSlots(item:Listing, orders:any[]=[], now=Date.now()):TimeSlo
   if(item.kind!=='class')return [];
   const schedule=schedules[item.id];
   let dates:string[]=[];
-  if(schedule){
+  if(item.weeklyAvailability){dates=weeklyDates(item.weeklyAvailability,item.duration,now)}else if(schedule){
     const today=new Date(now+7*3600000).toISOString().slice(0,10);
     const base=new Date(today+'T00:00:00+07:00').getTime();
     for(let i=0;i<28;i++){
@@ -26,7 +27,7 @@ export function timeSlots(item:Listing, orders:any[]=[], now=Date.now()):TimeSlo
       if(schedule.days.includes(day)&&date.getTime()>now+30*60000)dates.push(date.toISOString());
     }
   }else if(new Date(item.date).getTime()>now+30*60000)dates=[new Date(item.date).toISOString()];
-  return dates.map(date=>({date,remaining:Math.max(0,item.seats-item.filled-(item.live?0:orders.filter(o=>o.item===item.id&&new Date(o.date).getTime()===new Date(date).getTime()&&!['cancelled','refunded'].includes(o.status)).reduce((sum,o)=>sum+Number(o.seats),0)))}));
+  return dates.map(date=>({date,remaining:Math.max(0,item.seats-(item.live&&item.weeklyAvailability?(item.slotBookings||[]).filter(s=>Date.parse(s.date)===Date.parse(date)).reduce((n,s)=>n+s.seats,0):item.filled)-(item.live?0:orders.filter(o=>o.item===item.id&&new Date(o.date).getTime()===new Date(date).getTime()&&!['cancelled','refunded'].includes(o.status)).reduce((sum,o)=>sum+Number(o.seats),0)))}));
 }
 export function tutorReviews(item:Listing, reviews:any[]){
   const actual=reviews.filter(r=>r.item===item.id).map(r=>({...r,score:(r.clarity+r.usefulness+r.recommend)/3,sample:false}));

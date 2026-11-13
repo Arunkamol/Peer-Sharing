@@ -2,7 +2,7 @@ import publicKey from './public-key.json' with {type:'json'};
 
 // Authenticated server-to-server boundary. This is not a public database proxy.
 const key=crypto.subtle.importKey('jwk',publicKey,{name:'ECDSA',namedCurve:'P-256'},false,['verify']);
-const operations=new Set(['state','listing_get','file_access','download_complete','register_file','profile','mark','request','close_request','listing','listing_visibility','start_chat','chat_get','chat_message','chat_slot','notifications_read','book','cancel','checkin','complete','handover','review','message','dispute','report','offer']);
+const operations=new Set(['state','listing_get','file_access','download_complete','register_file','profile','mark','request','close_request','listing','listing_visibility','listing_schedule','start_chat','chat_get','chat_message','chat_slot','notifications_read','book','cancel','checkin','complete','handover','review','message','dispute','report','offer']);
 Deno.serve(async(req:Request)=>{
   const reply=(body:unknown,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
   if(req.method!=='POST')return reply({error:'Method not allowed'},405);

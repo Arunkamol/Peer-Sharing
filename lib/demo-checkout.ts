@@ -19,7 +19,7 @@ export function makeDemoOrder(item:Listing,actor:string,input:{requestId:string;
   if(item.owner===actor)throw new Error('ไม่สามารถซื้อรายการของตัวเอง / You cannot buy your own listing.');
   if(item.status&&item.status!=='published')throw new Error('รายการนี้ไม่พร้อมขาย / Listing unavailable.');
   if(item.kind==='digital'&&input.quantity!==1)throw new Error('ไฟล์ดิจิทัลเลือกได้ 1 รายการ / Digital quantity must be one.');
-  if(item.kind!=='digital'&&input.quantity>Math.max(0,item.seats-item.filled))throw new Error('จำนวนไม่เพียงพอ / Not enough availability.');
+  if((item.kind==='physical'||item.kind==='class'&&!item.weeklyAvailability)&&input.quantity>Math.max(0,item.seats-item.filled))throw new Error('จำนวนไม่เพียงพอ / Not enough availability.');
   const total=demoTotal(item.price,input.quantity);
   if(total!==input.quotedTotal)throw new Error('ราคาเปลี่ยนแล้ว กรุณาเปิดรายการใหม่ / Price changed. Please reopen this listing.');
   if(item.kind==='class'&&(!input.slot||!Number.isFinite(Date.parse(input.slot))||Date.parse(input.slot)<=now))throw new Error('กรุณาเลือกเวลาคลาสในอนาคต / Select a future class time.');

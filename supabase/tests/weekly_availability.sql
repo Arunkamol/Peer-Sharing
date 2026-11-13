@@ -1,0 +1,32 @@
+begin;
+set local role service_role;
+do $$
+declare result jsonb; listing_id uuid; first_id uuid:=gen_random_uuid(); second_id uuid:=gen_random_uuid(); next_monday date:=((now() at time zone 'Asia/Bangkok')::date+7+(8-extract(isodow from now() at time zone 'Asia/Bangkok')::int)%7); first_time timestamptz; second_time timestamptz; windows jsonb:='[{"day":1,"start":"09:00","end":"12:00"},{"day":7,"start":"14:00","end":"16:00"}]'; payload jsonb;
+begin
+ first_time:=(next_monday+time '09:00') at time zone 'Asia/Bangkok';second_time:=first_time+interval '1 hour';
+ payload:=jsonb_build_object('kind','class','title','Weekly schedule transaction test','course','คณะวิทยาศาสตร์','courseCode','2301117','duration',60,'seats',2,'minSeats',1,'price',100,'date',first_time,'objectives',jsonb_build_array('one','two','three'),'weeklyAvailability',windows);
+ assert peer.valid_weekly(payload),'valid weekly windows rejected';
+ assert not peer.valid_weekly(payload||'{"weeklyAvailability":[{"day":1,"start":"09:00","end":"10:00"},{"day":1,"start":"09:30","end":"11:00"}]}'),'overlap accepted';
+ assert not peer.slot_allowed(payload,first_time+interval '30 minutes'),'non-aligned start accepted';
+ assert not peer.slot_allowed(payload,first_time+interval '1 day'),'closed weekday accepted';
+ insert into peer.profiles(id,payload) values('weekly-test-tutor',jsonb_build_object('name','Schedule Test','faculty','Test'));
+ result:=public.peer_gateway(jsonb_build_object('op','listing','actor','weekly-test-tutor','data',payload));
+ assert result->>'ok'='true',result::text;listing_id:=(result->>'id')::uuid;
+ result:=public.peer_gateway(jsonb_build_object('op','listing_get','actor',null,'data',jsonb_build_object('id',listing_id)));
+ assert result->>'courseCode'='2301117' and result->'weeklyAvailability'=windows,'metadata did not persist';
+ result:=public.peer_gateway(jsonb_build_object('op','listing_schedule','actor','weekly-test-intruder','data',jsonb_build_object('id',listing_id,'weeklyAvailability',windows)));
+ assert result ? 'error','ownership guard failed';
+ result:=public.peer_gateway(jsonb_build_object('op','book','actor','weekly-test-learner','data',jsonb_build_object('item',listing_id,'requestId',first_id,'seats',2,'slot',first_time)));
+ assert result->>'ok'='true',result::text;
+ result:=public.peer_gateway(jsonb_build_object('op','book','actor','weekly-test-learner','data',jsonb_build_object('item',listing_id,'requestId',gen_random_uuid(),'seats',1,'slot',first_time)));
+ assert result ? 'error','overbooking accepted';
+ result:=public.peer_gateway(jsonb_build_object('op','book','actor','weekly-test-learner','data',jsonb_build_object('item',listing_id,'requestId',second_id,'seats',1,'slot',second_time)));
+ assert result->>'ok'='true','capacity incorrectly shared across different sessions';
+ assert (select (booked.payload->>'date')::timestamptz=second_time from peer.bookings booked where booked.id=second_id),'booking lost the chosen time';
+ result:=public.peer_gateway(jsonb_build_object('op','listing_get','actor',null,'data',jsonb_build_object('id',listing_id)));
+ assert jsonb_array_length(result->'slotBookings')=2,'public slot counts missing';
+ result:=public.peer_gateway(jsonb_build_object('op','listing_schedule','actor','weekly-test-tutor','data',jsonb_build_object('id',listing_id,'weeklyAvailability','[{"day":2,"start":"09:00","end":"12:00"}]'::jsonb,'courseCode','5500415')));
+ assert result->>'ok'='true',result::text;
+ assert (select (booked.payload->>'date')::timestamptz=first_time from peer.bookings booked where booked.id=first_id),'schedule edit changed confirmed booking';
+end $$;
+rollback;
