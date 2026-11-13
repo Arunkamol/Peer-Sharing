@@ -1,4 +1,5 @@
 'use client';
+import {ListingPhoto,PhotoCredits} from './campus-images';
 import {signInPath} from '@/lib/auth-paths';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {BookOpen,CalendarDays,Check,CheckCircle2,Clock,MessageCircle,MapPin,Send,Star,Users,Video} from 'lucide-react';
@@ -33,7 +34,7 @@ export function TutorProfile({item,en,orders,reviews,signedIn,onChat,onPurchase,
     <button className="text-back" onClick={onBack}>{t('กลับไปดูคลาสทั้งหมด','Back to all classes')}</button>
     <div className="tutor-layout">
       <div className="tutor-main">
-        <section className="tutor-identity">
+        <ListingPhoto item={item} en={en} detail/><PhotoCredits en={en}/><section className="tutor-identity">
           <span className={'tutor-avatar cover-'+item.color} aria-label={t('รูปโปรไฟล์เริ่มต้นของผู้สอน','Tutor’s default profile avatar')}>{item.tutorEn.slice(0,1)}</span>
           <div><span className="tutor-eyebrow">{t('รู้จักผู้สอนของคุณ','MEET YOUR TUTOR')}</span><h1>{en?item.tutorEn:item.tutor}</h1><p>{item.faculty}</p><div className="tutor-rating"><Star size={16} fill="currentColor"/><strong>{score.score}</strong><span>{score.count} {t('รีวิว','reviews')}</span>{sample&&<span className="sample-label">{t('โปรไฟล์ตัวอย่าง','Sample profile')}</span>}</div></div>
         </section>
